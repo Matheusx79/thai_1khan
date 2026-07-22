@@ -120,7 +120,9 @@ function speakThai(text, script) {
         } catch(e) {}
     }
 
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
+    audio.referrerPolicy = "no-referrer";
+    audio.src = audioUrl;
     window._currentThaiAudio = audio;
 
     const playPromise = audio.play();
