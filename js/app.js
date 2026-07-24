@@ -45,17 +45,21 @@ function init() {
     initFlashcards();
     initQuiz();
 
-    // Initialize Video Modal close events
-    const modal = document.getElementById('video-modal');
+    // Initialize Technique Modal close events
+    const modal = document.getElementById('technique-modal');
     const closeBtn = document.getElementById('modal-close-btn');
     if (closeBtn && modal) {
-        closeBtn.addEventListener('click', closeVideoModal);
+        closeBtn.addEventListener('click', closeTechniqueModal);
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                closeVideoModal();
+                closeTechniqueModal();
             }
         });
     }
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeTechniqueModal();
+    });
 }
 
 if (document.readyState === 'loading') {
@@ -151,48 +155,47 @@ if ('speechSynthesis' in window) {
 }
 
 /**
- * Open Video Modal with YouTube embed
+ * Open Technique Modal showing the demonstration image for a strike
  */
-function openVideoModal(item) {
-    if (!item.youtubeId) {
-        console.warn(`No YouTube ID specified for technique: ${item.thName}`);
-        return;
-    }
-    
-    const modal = document.getElementById('video-modal');
+function openTechniqueModal(item) {
+    const modal = document.getElementById('technique-modal');
+    if (!modal) return;
+
+    const catInfo = techniquesData.categories[item.category];
+    const category = document.getElementById('modal-category');
+    const script = document.getElementById('modal-script');
     const title = document.getElementById('modal-title');
     const subtitle = document.getElementById('modal-subtitle');
-    const iframe = document.getElementById('modal-iframe');
-    const directLink = document.getElementById('modal-direct-link');
-    const searchLink = document.getElementById('modal-search-link');
-    
-    if (modal && title && subtitle && iframe) {
-        title.textContent = item.thName;
-        subtitle.textContent = item.ptName;
-        iframe.src = `https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&rel=0`;
-        
-        // Update direct links
-        if (directLink) {
-            directLink.href = `https://www.youtube.com/watch?v=${item.youtubeId}`;
-        }
-        if (searchLink) {
-            const searchQuery = `Muay Thai ${item.thName} ${item.ptName}`;
-            searchLink.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-        }
-        
-        modal.classList.add('active');
+    const description = document.getElementById('modal-description');
+    const image = document.getElementById('modal-image');
+    const imageWrapper = modal.querySelector('.modal-image-wrapper');
+
+    if (category) category.textContent = catInfo ? `${catInfo.icon} ${catInfo.title.split(' (')[0]}` : '';
+    if (script) script.textContent = item.thScript;
+    if (title) title.textContent = item.thName;
+    if (subtitle) subtitle.textContent = item.ptName;
+    if (description) description.textContent = item.notes || '';
+
+    // Use the technique's own image when available, otherwise fall back to its category image
+    if (image) {
+        const src = item.image || (catInfo ? catInfo.image : '');
+        image.src = src;
+        image.alt = `Demonstração: ${item.ptName}`;
+        // Clicking the image replays the pronunciation
+        image.style.cursor = 'pointer';
+        image.onclick = () => speakThai(item.thName, item.thScript);
     }
+    if (imageWrapper) imageWrapper.style.display = 'block';
+
+    modal.classList.add('active');
 }
 
 /**
- * Close Video Modal and stop video playback
+ * Close the Technique Modal
  */
-function closeVideoModal() {
-    const modal = document.getElementById('video-modal');
-    const iframe = document.getElementById('modal-iframe');
-    
-    if (modal && iframe) {
-        iframe.src = '';
+function closeTechniqueModal() {
+    const modal = document.getElementById('technique-modal');
+    if (modal) {
         modal.classList.remove('active');
     }
 }
@@ -301,20 +304,23 @@ function renderCatalog() {
                 </div>
             </div>
             <div class="card-body">
+                <p class="card-script">${item.thScript}</p>
                 <h3 class="card-th">${item.thName}</h3>
                 <p class="card-pt">${item.ptName}</p>
                 ${item.notes ? `<p class="card-notes">${item.notes}</p>` : ''}
             </div>
         `;
 
-        // Add Speech Event to Audio Button
+        // Add Speech Event to Audio Button (does not open the modal)
         card.querySelector('.audio-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             speakThai(item.thName, item.thScript);
         });
 
-        // Add Click card to speak
+        // Click card to open the technique modal and hear the pronunciation
+        card.style.cursor = 'pointer';
         card.addEventListener('click', () => {
+            openTechniqueModal(item);
             speakThai(item.thName, item.thScript);
         });
 
@@ -446,9 +452,12 @@ function updateFlashcardUI() {
         currentIndexEl.textContent = '0';
         totalCountEl.textContent = '0';
         
+        document.getElementById('fc-front-script').textContent = '';
         document.getElementById('fc-front-th').textContent = 'Sem técnicas';
         document.getElementById('fc-front-category').textContent = '-';
+        document.getElementById('fc-back-image').src = '';
         document.getElementById('fc-back-th-sub').textContent = '';
+        document.getElementById('fc-back-th-roman').textContent = '';
         document.getElementById('fc-back-pt').textContent = 'Nenhuma técnica cadastrada';
         document.getElementById('fc-back-notes').textContent = '';
         return;
@@ -463,11 +472,16 @@ function updateFlashcardUI() {
 
     // Populate front
     document.getElementById('fc-front-category').textContent = categoryTitle;
+    document.getElementById('fc-front-script').textContent = item.thScript;
     document.getElementById('fc-front-th').textContent = item.thName;
 
     // Populate back
     document.getElementById('fc-back-category').textContent = categoryTitle;
-    document.getElementById('fc-back-th-sub').textContent = item.thName;
+    const backImage = document.getElementById('fc-back-image');
+    backImage.src = catInfo ? catInfo.image : '';
+    backImage.alt = categoryTitle;
+    document.getElementById('fc-back-th-sub').textContent = item.thScript;
+    document.getElementById('fc-back-th-roman').textContent = item.thName;
     document.getElementById('fc-back-pt').textContent = item.ptName;
     document.getElementById('fc-back-notes').textContent = item.notes || '';
 }
@@ -626,15 +640,18 @@ function displayQuestion() {
 
     // Setup question display based on Mode
     const questionTextEl = document.getElementById('quiz-question-text');
+    const questionScriptEl = document.getElementById('quiz-question-script');
     const instructionEl = document.getElementById('quiz-question-instruction');
 
     if (state.quiz.mode === 'th-to-pt') {
         instructionEl.textContent = 'Qual é a tradução desta técnica?';
+        questionScriptEl.textContent = currentQ.thScript;
         questionTextEl.textContent = currentQ.thName;
         // Automatically speak Thai word on loading if mode is Thai
         speakThai(currentQ.thName, currentQ.thScript);
     } else {
         instructionEl.textContent = 'Qual é o nome em tailandês desta técnica?';
+        questionScriptEl.textContent = '';
         questionTextEl.textContent = currentQ.ptName;
     }
 
@@ -658,12 +675,15 @@ function displayQuestion() {
 
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
-        
+
         // Show correct label based on mode
         if (state.quiz.mode === 'th-to-pt') {
             btn.textContent = option.ptName;
         } else {
-            btn.textContent = option.thName;
+            btn.innerHTML = `
+                <span class="quiz-option-script">${option.thScript}</span>
+                <span class="quiz-option-roman">${option.thName}</span>
+            `;
         }
 
         btn.addEventListener('click', () => handleOptionClick(idx, btn, isCorrect));

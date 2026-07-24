@@ -57,25 +57,25 @@ const techniquesData = {
   },
   items: [
     // Punho - MAHD
-    { id: "m1", category: "mahd", thName: "Mahd Trong Sai", thScript: "หมัดตรงซ้าย", ptName: "Jab", notes: "Mão da frente" },
-    { id: "m2", category: "mahd", thName: "Mahd Trong Gua", thScript: "หมัดตรงขวา", ptName: "Direto", notes: "Mão de trás" },
-    { id: "m3", category: "mahd", thName: "Mahd Trong Ni Son", thScript: "หมัดตรงสอง", ptName: "Jab direto", notes: "Combinação rápida" },
-    { id: "m4", category: "mahd", thName: "Mahd Wieng Gua", thScript: "หมัดเหวี่ยงขวา", ptName: "Cruzado", notes: "" },
-    { id: "m5", category: "mahd", thName: "Mahd Nghat Gua", thScript: "หมัดงัดขวา", ptName: "Apper (Uppercut)", notes: "" },
-    { id: "m6", category: "mahd", thName: "Mahd Wieng Chay Kong Gua", thScript: "หมัดเหวี่ยงชายโครงขวา", ptName: "Hook (Gancho na linha de cintura)", notes: "" },
+    { id: "m1", category: "mahd", thName: "Mahd Trong Sai", thScript: "หมัดตรงซ้าย", ptName: "Jab", notes: "Mão da frente", image: "assets/images/items/jab.png" },
+    { id: "m2", category: "mahd", thName: "Mahd Trong Gua", thScript: "หมัดตรงขวา", ptName: "Direto", notes: "Mão de trás", image: "assets/images/items/cross.png" },
+    { id: "m3", category: "mahd", thName: "Mahd Trong Ni Son", thScript: "หมัดตรงสอง", ptName: "Jab direto", notes: "Combinação rápida", image: "assets/images/items/jab-cross.png" },
+    { id: "m4", category: "mahd", thName: "Mahd Wieng Gua", thScript: "หมัดเหวี่ยงขวา", ptName: "Cruzado", notes: "", image: "assets/images/items/hook.png" },
+    { id: "m5", category: "mahd", thName: "Mahd Nghat Gua", thScript: "หมัดงัดขวา", ptName: "Apper (Uppercut)", notes: "", image: "assets/images/items/uppercut.png" },
+    { id: "m6", category: "mahd", thName: "Mahd Wieng Chay Kong Gua", thScript: "หมัดเหวี่ยงชายโครงขวา", ptName: "Hook (Gancho na linha de cintura)", notes: "", image: "assets/images/items/body-hook.png" },
 
     // Chutes - TEE
-    { id: "t1", category: "tee", thName: "Tee Wieng Lang Gua", thScript: "เตะเหวี่ยงหลังขวา", ptName: "Chute na coxa", notes: "Low kick" },
-    { id: "t2", category: "tee", thName: "Tee Chiang Gua", thScript: "เตะเฉียงขวา", ptName: "Chute na costela", notes: "Middle kick" },
-    { id: "t3", category: "tee", thName: "Tee Suu Gua", thScript: "เตะสูงขวา", ptName: "Chute na cabeça", notes: "High kick" },
+    { id: "t1", category: "tee", thName: "Tee Wieng Lang Gua", thScript: "เตะเหวี่ยงหลังขวา", ptName: "Chute na coxa", notes: "Low kick", image: "assets/images/items/low-kick.png" },
+    { id: "t2", category: "tee", thName: "Tee Chiang Gua", thScript: "เตะเฉียงขวา", ptName: "Chute na costela", notes: "Middle kick", image: "assets/images/items/middle-kick.png" },
+    { id: "t3", category: "tee", thName: "Tee Suu Gua", thScript: "เตะสูงขวา", ptName: "Chute na cabeça", notes: "High kick", image: "assets/images/items/high-kick.png" },
 
     // Tip
-    { id: "tp1", category: "tip", thName: "Tip Trong Sai", thScript: "ถีบตรงซ้าย", ptName: "Chute frontal", notes: "Com a perna da frente" },
-    { id: "tp2", category: "tip", thName: "Tip Bom Gua", thScript: "ถีบก้มขวา", ptName: "Chute frontal no queixo", notes: "Chute reto ascendente" },
-    { id: "tp3", category: "tip", thName: "Tip Khab Lang Gua", thScript: "ถีบกลับหลังขวา", ptName: "Chute giratório", notes: "Chute frontal giratório de calcanhar" },
+    { id: "tp1", category: "tip", thName: "Tip Trong Sai", thScript: "ถีบตรงซ้าย", ptName: "Chute frontal", notes: "Com a perna da frente", image: "assets/images/items/teep.png" },
+    { id: "tp2", category: "tip", thName: "Tip Bom Gua", thScript: "ถีบก้มขวา", ptName: "Chute frontal no queixo", notes: "Chute reto ascendente", image: "assets/images/items/teep-chin.png" },
+    { id: "tp3", category: "tip", thName: "Tip Khab Lang Gua", thScript: "ถีบกลับหลังขวา", ptName: "Chute giratório", notes: "Chute frontal giratório de calcanhar", image: "assets/images/items/spinning-teep.png" },
 
     // Joelho - KHAO
-    { id: "k1", category: "khao", thName: "Khao Trong Gua", thScript: "เข่าตรงขวา", ptName: "Joelho reto", notes: "" },
+    { id: "k1", category: "khao", thName: "Khao Trong Gua", thScript: "เข่าตรงขวา", ptName: "Joelho reto", notes: "", image: "assets/images/items/straight-knee.png" },
     { id: "k2", category: "khao", thName: "Khao Chiang Gua", thScript: "เข่าเฉียงขวา", ptName: "Joelho semirreto", notes: "Diagonal" },
     { id: "k3", category: "khao", thName: "Khao Tad Gua", thScript: "เข่าตัดขวา", ptName: "Joelho 90 graus", notes: "Joelhada horizontal/lateral" },
     { id: "k4", category: "khao", thName: "Khao Tii Gua", thScript: "เข่าตีขวา", ptName: "Joelho de fora para dentro", notes: "Joelhada circular" },
