@@ -1072,6 +1072,60 @@ header p {
     padding: 2rem 1rem;
 }
 
+.quiz-ranking-auth {
+    max-width: 420px;
+    margin: 0 auto 1.5rem;
+}
+
+.quiz-ranking-auth-msg {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.quiz-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.quiz-login-form input {
+    width: 100%;
+    background-color: var(--bg-secondary);
+    border: 1px solid rgba(237, 230, 211, 0.1);
+    border-radius: var(--border-radius-md);
+    padding: 0.85rem 1.1rem;
+    color: var(--text-primary);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 1rem;
+    transition: var(--transition-fast);
+}
+
+.quiz-login-form input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+}
+
+.quiz-login-error {
+    color: #E08C8C;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+}
+
+.quiz-save-error {
+    color: #E08C8C;
+    font-size: 0.85rem;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+.quiz-ranking-account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 /* ==========================================================================
    FOOTER
    ========================================================================== */
@@ -1379,6 +1433,15 @@ footer a:hover {
 
     .quiz-ranking-entry-meta {
         font-size: 0.75rem;
+    }
+
+    .quiz-ranking-auth-msg {
+        font-size: 0.82rem;
+    }
+
+    .quiz-login-form input {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
     }
 
     /* Modal */

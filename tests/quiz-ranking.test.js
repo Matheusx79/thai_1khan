@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '../js/quiz-ranking.js';
-const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries } = globalThis.QuizRanking;
+const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError } = globalThis.QuizRanking;
 
 describe('formatModeLabel', () => {
     it('labels th-to-pt mode as Thai to Portuguese', () => {
@@ -85,5 +85,16 @@ describe('sortRankEntries', () => {
         sortRankEntries(entries);
 
         expect(entries).toEqual(original);
+    });
+});
+
+describe('mapSaveError', () => {
+    it('returns null when there is no error', () => {
+        expect(mapSaveError(null)).toBe(null);
+    });
+
+    it('returns a user-facing message when there is an error', () => {
+        const error = { message: 'Failed to fetch' };
+        expect(mapSaveError(error)).toBe('Não foi possível salvar seu resultado. Verifique sua conexão.');
     });
 });

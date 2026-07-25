@@ -33,10 +33,16 @@ function sortRankEntries(entries) {
     });
 }
 
+function mapSaveError(error) {
+    if (!error) return null;
+    return 'Não foi possível salvar seu resultado. Verifique sua conexão.';
+}
+
 globalThis.QuizRanking = {
     formatModeLabel,
     formatCategoriesLabel,
     buildRankEntry,
-    sortRankEntries
+    sortRankEntries,
+    mapSaveError
 };
 })();

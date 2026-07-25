@@ -232,7 +232,9 @@
                             </div>
                             
                             <p class="quiz-results-msg" id="results-message">Excelente trabalho! Você está no caminho certo para o exame de graduação.</p>
-                            
+
+                            <p class="quiz-save-error" id="quiz-save-error" style="display: none;"></p>
+
                             <div class="quiz-results-actions">
                                 <button class="start-quiz-btn" id="quiz-retry-btn" style="margin-top: 0;">Refazer Treino</button>
                                 <button class="quiz-setup-btn" id="quiz-finish-btn" style="padding: 1rem 2rem; border-radius: 50px;">Voltar ao Menu</button>
@@ -246,6 +248,25 @@
                         <div class="quiz-ranking">
                             <h2 class="quiz-results-title">Ranking da Sessão</h2>
                             <p class="quiz-ranking-subtitle">Todos os treinos concluídos nesta sessão, do melhor para o pior. O ranking reseta ao recarregar a página.</p>
+
+                            <div class="quiz-ranking-auth" id="quiz-ranking-auth">
+                                <!-- Guest state: shown when not logged in -->
+                                <div class="quiz-ranking-guest-cta" id="quiz-ranking-guest-cta">
+                                    <p class="quiz-ranking-auth-msg">Faça login para salvar seu histórico entre sessões e ver o ranking dos parceiros de treino.</p>
+                                    <form class="quiz-login-form" id="quiz-login-form">
+                                        <input type="email" id="quiz-login-email" placeholder="Email" autocomplete="username">
+                                        <input type="password" id="quiz-login-password" placeholder="Senha" autocomplete="current-password">
+                                        <button type="submit" class="quiz-setup-btn" id="quiz-login-submit">Entrar</button>
+                                    </form>
+                                    <p class="quiz-login-error" id="quiz-login-error" style="display: none;"></p>
+                                </div>
+
+                                <!-- Logged-in state: shown when a session exists -->
+                                <div class="quiz-ranking-account" id="quiz-ranking-account" style="display: none;">
+                                    <p class="quiz-ranking-auth-msg">Logado como <strong id="quiz-account-name"></strong></p>
+                                    <button type="button" class="quiz-setup-btn" id="quiz-logout-btn">Sair</button>
+                                </div>
+                            </div>
 
                             <ol class="quiz-ranking-list" id="quiz-ranking-list">
                                 <!-- Dynamically populated ranking entries -->
@@ -296,9 +317,15 @@
     </div>
 
 
+    <!-- Cliente Supabase (versão fixada + hash de integridade) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8/dist/umd/supabase.min.js"
+        integrity="sha384-Tve8O+C6PBzsIMK/IRCwHbi8fyEzXIlIs6OfVBZHubplwYhaQF/4Mzxqgg+pp/oy"
+        crossorigin="anonymous"></script>
+
     <!-- Scripts da aplicação -->
     <script src="js/data/techniques.js"></script>
     <script src="js/quiz-ranking.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

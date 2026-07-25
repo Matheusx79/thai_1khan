@@ -503,6 +503,8 @@ function initQuiz() {
     const setupRankingBtn = document.getElementById('quiz-setup-ranking-btn');
     const resultsRankingBtn = document.getElementById('quiz-results-ranking-btn');
     const rankingBackBtn = document.getElementById('quiz-ranking-back-btn');
+    const loginForm = document.getElementById('quiz-login-form');
+    const logoutBtn = document.getElementById('quiz-logout-btn');
 
     // Populate Quiz Setup Category options
     const allOption = document.createElement('button');
@@ -586,6 +588,72 @@ function initQuiz() {
     setupRankingBtn.addEventListener('click', showRanking);
     resultsRankingBtn.addEventListener('click', showRanking);
     rankingBackBtn.addEventListener('click', resetQuizToSetup);
+
+    loginForm.addEventListener('submit', handleLoginSubmit);
+    logoutBtn.addEventListener('click', handleLogoutClick);
+}
+
+async function handleLoginSubmit(e) {
+    e.preventDefault();
+
+    const emailInput = document.getElementById('quiz-login-email');
+    const passwordInput = document.getElementById('quiz-login-password');
+    const errorEl = document.getElementById('quiz-login-error');
+    const submitBtn = document.getElementById('quiz-login-submit');
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    const validation = window.Auth.validateLoginInput({ email, password });
+    if (!validation.valid) {
+        errorEl.textContent = validation.error;
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    errorEl.style.display = 'none';
+    submitBtn.disabled = true;
+
+    const result = await window.Auth.signIn({ email, password });
+
+    submitBtn.disabled = false;
+
+    if (!result.success) {
+        errorEl.textContent = 'Não foi possível entrar. Verifique seu email e senha.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    emailInput.value = '';
+    passwordInput.value = '';
+    await updateRankingAuthUI();
+}
+
+async function handleLogoutClick() {
+    await window.Auth.signOut();
+    await updateRankingAuthUI();
+}
+
+/**
+ * Toggle the ranking screen between the guest login prompt and the
+ * logged-in account view, based on the current Supabase session.
+ */
+async function updateRankingAuthUI() {
+    const guestCta = document.getElementById('quiz-ranking-guest-cta');
+    const accountBox = document.getElementById('quiz-ranking-account');
+    const accountName = document.getElementById('quiz-account-name');
+
+    const session = await window.Auth.getSession();
+
+    if (session) {
+        guestCta.style.display = 'none';
+        accountBox.style.display = 'block';
+        const profile = await window.Auth.getCurrentProfile();
+        accountName.textContent = profile ? profile.display_name : session.user.email;
+    } else {
+        guestCta.style.display = 'block';
+        accountBox.style.display = 'none';
+    }
 }
 
 function resetQuizToSetup() {
@@ -757,10 +825,13 @@ function nextQuestion() {
     }
 }
 
-function showQuizResults() {
+async function showQuizResults() {
     document.getElementById('quiz-board').style.display = 'none';
     const resultsScreen = document.getElementById('quiz-results-screen');
     resultsScreen.style.display = 'block';
+
+    const saveErrorEl = document.getElementById('quiz-save-error');
+    saveErrorEl.style.display = 'none';
 
     const score = state.quiz.score;
     const total = state.quiz.questions.length;
@@ -780,16 +851,37 @@ function showQuizResults() {
         messageEl.textContent = '💪 Não desanime! O Muay Thai exige repetição. Refaça o treino e tente novamente.';
     }
 
+    const selectedCategories = state.quiz.selectedCategories;
+    const mode = state.quiz.mode;
+
     const entry = window.QuizRanking.buildRankEntry({
         score,
         total,
-        selectedCategories: state.quiz.selectedCategories,
+        selectedCategories,
         categories: techniquesData.categories,
-        mode: state.quiz.mode,
+        mode,
         timestamp: Date.now()
     });
     state.quiz.rankEntries.push(entry);
     state.quiz.lastRankEntry = entry;
+
+    const session = await window.Auth.getSession();
+    if (!window.Auth.shouldPersistAttempt(session)) return;
+
+    const { error } = await window.Auth.saveRankEntry({
+        userId: session.user.id,
+        score,
+        total,
+        percentage: entry.percentage,
+        selectedCategories: selectedCategories.join(','),
+        mode
+    });
+
+    const errorMessage = window.QuizRanking.mapSaveError(error);
+    if (errorMessage) {
+        saveErrorEl.textContent = errorMessage;
+        saveErrorEl.style.display = 'block';
+    }
 }
 
 /**
@@ -801,6 +893,7 @@ function showRanking() {
     document.getElementById('quiz-results-screen').style.display = 'none';
     document.getElementById('quiz-ranking-screen').style.display = 'block';
 
+    updateRankingAuthUI();
     renderRanking();
 }
 
