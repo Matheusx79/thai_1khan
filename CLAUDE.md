@@ -30,3 +30,11 @@ The app is three tabs (Catalog, Flashcards, Quiz) sharing one data source, wired
 - **Styling** (`styles/main.css`) — a single stylesheet driven by CSS custom properties (e.g. `--accent-gold`, `--bg-tertiary`, `--border-radius-md`) defined once and reused across components; follow the existing variable names rather than hardcoding colors/sizes.
 
 - **Deployment**: the project is served from GitHub Pages (see recent commit history around TTS referrer-policy fixes) — there is no server-side code, so all functionality must work as static files.
+
+## Responsive Design (PC + Phone)
+
+This app must work well on both desktop and phone screens — real users take this exam-prep tool out on a phone. Any UI change (new markup, new component, layout/spacing/typography edit) must be verified at both a desktop width and a narrow phone width (~360-430px) before being considered done, not just at whatever width the editor/browser happens to be.
+
+- Existing breakpoints in `styles/main.css`: `768px` (search/filter bar stacking), `576px` (quiz options grid), and `480px` (small-phone breakpoint covering header, nav tabs, catalog cards, flashcard box/fonts, quiz setup/board, and the detail modal). Add new mobile-specific rules inside the existing `480px` block (or a new breakpoint following the same fixed-value media-query pattern) rather than introducing `clamp()`-based fluid scaling, to stay consistent with the rest of the file.
+- To test on a real phone on the same Wi-Fi: run `npm run dev`, then open the **LAN IP** it prints (e.g. `http://192.168.x.x:3000`) on the phone — `http://localhost:3000` only resolves to the phone itself, not the PC, so it will never work from a phone. If the phone still can't connect, the most common cause is router AP/client isolation, not the app or Windows Firewall (Node.js already has an inbound-allow firewall rule on Private+Public profiles by default).
+- Browser automation viewport resize (e.g. Claude's Chrome tools) may not reflect real narrow-width rendering reliably in this environment — embedding the page in a sized `<iframe>` and screenshotting that region is a working fallback for emulating a phone viewport when real-device testing isn't immediately available. Real-device testing on an actual phone remains the final check.
