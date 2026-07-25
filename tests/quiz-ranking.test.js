@@ -125,27 +125,35 @@ describe('buildHistoryEntry', () => {
 });
 
 describe('formatLeaderboardEntry', () => {
-    it('formats a raw get_leaderboard() row into a display entry', () => {
+    it('formats a raw get_leaderboard() row into a display entry with the cumulative total', () => {
         const row = {
             display_name: 'Smoke Test',
-            score: 4,
-            total: 10,
-            percentage: 40,
-            selected_categories: 'all',
-            mode: 'th-to-pt',
-            created_at: '2024-11-14T12:00:00.000Z'
+            total_score: 6,
+            attempts_count: 2
         };
 
-        const entry = formatLeaderboardEntry(row, {});
+        const entry = formatLeaderboardEntry(row);
 
         expect(entry).toEqual({
             displayName: 'Smoke Test',
-            score: 4,
-            total: 10,
-            percentage: 40,
-            categoriesLabel: 'Todas',
-            modeLabel: 'Thai ➡️ Português',
-            timestamp: new Date('2024-11-14T12:00:00.000Z').getTime()
+            totalScore: 6,
+            attemptsCount: 2
+        });
+    });
+
+    it('formats a single-attempt trainee the same way', () => {
+        const row = {
+            display_name: 'Smoke Test Two',
+            total_score: 9,
+            attempts_count: 1
+        };
+
+        const entry = formatLeaderboardEntry(row);
+
+        expect(entry).toEqual({
+            displayName: 'Smoke Test Two',
+            totalScore: 9,
+            attemptsCount: 1
         });
     });
 });

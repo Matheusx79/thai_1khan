@@ -55,20 +55,17 @@ function isNewPersonalBest(entry, allEntries) {
 }
 
 /**
- * Format a raw get_leaderboard() RPC row (one best attempt per trainee,
- * already sorted server-side) into a display entry, mirroring
- * buildHistoryEntry but keeping the trainee's display name.
+ * Format a raw get_leaderboard() RPC row (one row per trainee, their
+ * cumulative score summed across every saved attempt, already sorted
+ * best-to-worst server-side) into a display entry. Per-attempt fields
+ * (mode, categories, a single timestamp) don't apply to a summed value
+ * and are intentionally dropped.
  */
-function formatLeaderboardEntry(row, categories) {
-    const selectedCategories = row.selected_categories.split(',');
+function formatLeaderboardEntry(row) {
     return {
         displayName: row.display_name,
-        score: row.score,
-        total: row.total,
-        percentage: row.percentage,
-        categoriesLabel: formatCategoriesLabel(selectedCategories, categories),
-        modeLabel: formatModeLabel(row.mode),
-        timestamp: new Date(row.created_at).getTime()
+        totalScore: row.total_score,
+        attemptsCount: row.attempts_count
     };
 }
 

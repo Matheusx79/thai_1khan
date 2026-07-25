@@ -36,7 +36,7 @@ const state = {
         rankEntries: [], // in-memory session ranking, reset on page reload
         lastRankEntry: null,
         historyEntries: [], // logged-in user's persisted rank_entries rows, refreshed on each ranking screen visit
-        leaderboardEntries: [] // every trainee's single best attempt via get_leaderboard(), refreshed on each ranking screen visit
+        leaderboardEntries: [] // every trainee's cumulative total score via get_leaderboard(), refreshed on each ranking screen visit
     }
 };
 
@@ -753,13 +753,14 @@ function escapeHtml(str) {
 }
 
 /**
- * Fetch every trainee's single best attempt (via the get_leaderboard() RPC)
- * and render them, sorted best-to-worst (already sorted server-side).
+ * Fetch every trainee's cumulative total score (sum of score across all of
+ * their saved attempts, via the get_leaderboard() RPC) and render them,
+ * sorted highest-total-first (already sorted server-side).
  */
 async function loadLeaderboard() {
     const rows = await window.Auth.getLeaderboard();
     state.quiz.leaderboardEntries = rows.map(row =>
-        window.QuizRanking.formatLeaderboardEntry(row, techniquesData.categories)
+        window.QuizRanking.formatLeaderboardEntry(row)
     );
     renderLeaderboard();
 }
@@ -778,27 +779,25 @@ function renderLeaderboard() {
     list.style.display = 'block';
     emptyState.style.display = 'none';
 
-    // Already sorted best-to-worst by the get_leaderboard() RPC server-side.
+    // Already sorted highest-cumulative-total-first by the get_leaderboard()
+    // RPC server-side (ties broken by most attempts, then most recent activity).
     state.quiz.leaderboardEntries.forEach((entry, index) => {
         const li = document.createElement('li');
         li.className = 'quiz-ranking-entry';
 
-        const date = new Date(entry.timestamp);
-        const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        const timeLabel = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const attemptsLabel = entry.attemptsCount === 1
+            ? '1 tentativa salva'
+            : `${entry.attemptsCount} tentativas salvas`;
 
         li.innerHTML = `
             <div class="quiz-ranking-entry-main">
                 <span class="quiz-ranking-entry-rank">#${index + 1}</span>
-                <span class="quiz-ranking-entry-pct">${entry.percentage}%</span>
-                <span class="quiz-ranking-entry-score">${entry.score}/${entry.total}</span>
+                <span class="quiz-ranking-entry-total">${entry.totalScore} pontos</span>
                 ${index === 0 ? '<span class="quiz-ranking-badge">Líder</span>' : ''}
             </div>
             <div class="quiz-ranking-entry-meta">
                 <span class="quiz-ranking-entry-name">${escapeHtml(entry.displayName)}</span>
-                <span>${entry.categoriesLabel}</span>
-                <span>${entry.modeLabel}</span>
-                <span>${dateLabel} ${timeLabel}</span>
+                <span>${attemptsLabel}</span>
             </div>
         `;
 

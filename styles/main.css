@@ -1049,6 +1049,16 @@ header p {
     color: var(--accent-gold);
 }
 
+/* Leaderboard's cumulative total (sum of score across all attempts) -
+   same prominent treatment as .quiz-ranking-entry-pct, but a distinct
+   class since it isn't a percentage of a single attempt. */
+.quiz-ranking-entry-total {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+}
+
 .quiz-ranking-entry-name {
     font-weight: 600;
     color: var(--text-primary);
@@ -1485,7 +1495,8 @@ footer a:hover {
         min-width: 1.5rem;
     }
 
-    .quiz-ranking-entry-pct {
+    .quiz-ranking-entry-pct,
+    .quiz-ranking-entry-total {
         font-size: 1.1rem;
     }
 
