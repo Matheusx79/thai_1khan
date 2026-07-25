@@ -1034,11 +1034,24 @@ header p {
     margin-bottom: 0.4rem;
 }
 
+.quiz-ranking-entry-rank {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 1.75rem;
+}
+
 .quiz-ranking-entry-pct {
     font-family: 'Oswald', sans-serif;
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--accent-gold);
+}
+
+.quiz-ranking-entry-name {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .quiz-ranking-entry-score {
@@ -1465,6 +1478,11 @@ footer a:hover {
 
     .quiz-ranking-entry-main {
         flex-wrap: wrap;
+    }
+
+    .quiz-ranking-entry-rank {
+        font-size: 0.75rem;
+        min-width: 1.5rem;
     }
 
     .quiz-ranking-entry-pct {

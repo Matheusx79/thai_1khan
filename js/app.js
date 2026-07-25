@@ -35,7 +35,8 @@ const state = {
         correctAnswerIndex: -1,
         rankEntries: [], // in-memory session ranking, reset on page reload
         lastRankEntry: null,
-        historyEntries: [] // logged-in user's persisted rank_entries rows, refreshed on each ranking screen visit
+        historyEntries: [], // logged-in user's persisted rank_entries rows, refreshed on each ranking screen visit
+        leaderboardEntries: [] // every trainee's single best attempt via get_leaderboard(), refreshed on each ranking screen visit
     }
 };
 
@@ -662,6 +663,7 @@ async function updateRankingAuthUI() {
         const profile = await window.Auth.getCurrentProfile();
         accountName.textContent = profile ? profile.display_name : session.user.email;
         await loadHistory(session.user.id);
+        await loadLeaderboard();
     } else {
         guestCta.style.display = 'block';
         accountBox.style.display = 'none';
@@ -730,6 +732,70 @@ function renderHistory() {
                 ${isBest ? '<span class="quiz-ranking-badge">Recorde!</span>' : ''}
             </div>
             <div class="quiz-ranking-entry-meta">
+                <span>${entry.categoriesLabel}</span>
+                <span>${entry.modeLabel}</span>
+                <span>${dateLabel} ${timeLabel}</span>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+/**
+ * Escape a user-controlled string (e.g. a trainee's own display_name) before
+ * interpolating it into an innerHTML template, to avoid stored XSS.
+ */
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
+ * Fetch every trainee's single best attempt (via the get_leaderboard() RPC)
+ * and render them, sorted best-to-worst (already sorted server-side).
+ */
+async function loadLeaderboard() {
+    const rows = await window.Auth.getLeaderboard();
+    state.quiz.leaderboardEntries = rows.map(row =>
+        window.QuizRanking.formatLeaderboardEntry(row, techniquesData.categories)
+    );
+    renderLeaderboard();
+}
+
+function renderLeaderboard() {
+    const list = document.getElementById('quiz-leaderboard-list');
+    const emptyState = document.getElementById('quiz-leaderboard-empty');
+    list.innerHTML = '';
+
+    if (state.quiz.leaderboardEntries.length === 0) {
+        list.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    list.style.display = 'block';
+    emptyState.style.display = 'none';
+
+    // Already sorted best-to-worst by the get_leaderboard() RPC server-side.
+    state.quiz.leaderboardEntries.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.className = 'quiz-ranking-entry';
+
+        const date = new Date(entry.timestamp);
+        const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const timeLabel = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        li.innerHTML = `
+            <div class="quiz-ranking-entry-main">
+                <span class="quiz-ranking-entry-rank">#${index + 1}</span>
+                <span class="quiz-ranking-entry-pct">${entry.percentage}%</span>
+                <span class="quiz-ranking-entry-score">${entry.score}/${entry.total}</span>
+                ${index === 0 ? '<span class="quiz-ranking-badge">Líder</span>' : ''}
+            </div>
+            <div class="quiz-ranking-entry-meta">
+                <span class="quiz-ranking-entry-name">${escapeHtml(entry.displayName)}</span>
                 <span>${entry.categoriesLabel}</span>
                 <span>${entry.modeLabel}</span>
                 <span>${dateLabel} ${timeLabel}</span>

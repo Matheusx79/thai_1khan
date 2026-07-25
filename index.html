@@ -297,7 +297,15 @@
                                 </div>
 
                                 <!-- Ticket #7 (Leaderboard view) fills this in independently -->
-                                <div id="quiz-leaderboard-content" style="display: none;"></div>
+                                <div id="quiz-leaderboard-content" style="display: none;">
+                                    <ol class="quiz-ranking-list" id="quiz-leaderboard-list">
+                                        <!-- Dynamically populated with every trainee's single best attempt via get_leaderboard() -->
+                                    </ol>
+
+                                    <div class="quiz-ranking-empty" id="quiz-leaderboard-empty" style="display: none;">
+                                        <p>Ainda não há resultados de outros parceiros de treino no ranking geral.</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <button class="quiz-setup-btn" id="quiz-ranking-back-btn" style="padding: 1rem 2rem; border-radius: 50px; margin-top: 1.5rem;">Voltar ao Menu</button>

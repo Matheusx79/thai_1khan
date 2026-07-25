@@ -54,6 +54,24 @@ function isNewPersonalBest(entry, allEntries) {
     return sortRankEntries(allEntries)[0] === entry;
 }
 
+/**
+ * Format a raw get_leaderboard() RPC row (one best attempt per trainee,
+ * already sorted server-side) into a display entry, mirroring
+ * buildHistoryEntry but keeping the trainee's display name.
+ */
+function formatLeaderboardEntry(row, categories) {
+    const selectedCategories = row.selected_categories.split(',');
+    return {
+        displayName: row.display_name,
+        score: row.score,
+        total: row.total,
+        percentage: row.percentage,
+        categoriesLabel: formatCategoriesLabel(selectedCategories, categories),
+        modeLabel: formatModeLabel(row.mode),
+        timestamp: new Date(row.created_at).getTime()
+    };
+}
+
 globalThis.QuizRanking = {
     formatModeLabel,
     formatCategoriesLabel,
@@ -61,6 +79,7 @@ globalThis.QuizRanking = {
     sortRankEntries,
     mapSaveError,
     buildHistoryEntry,
-    isNewPersonalBest
+    isNewPersonalBest,
+    formatLeaderboardEntry
 };
 })();

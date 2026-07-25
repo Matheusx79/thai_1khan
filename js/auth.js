@@ -91,6 +91,18 @@ async function getRankHistory(userId) {
     return data;
 }
 
+/**
+ * Fetch the leaderboard: one row per trainee, their single best attempt,
+ * already sorted best-to-worst server-side. Bypasses per-row RLS via the
+ * SECURITY DEFINER get_leaderboard() function. Returns [] on error so the
+ * "Ranking Geral" view can render an empty state rather than throw.
+ */
+async function getLeaderboard() {
+    const { data, error } = await client.rpc('get_leaderboard');
+    if (error) return [];
+    return data;
+}
+
 globalThis.Auth = {
     validateLoginInput,
     signIn,
@@ -99,6 +111,7 @@ globalThis.Auth = {
     getCurrentProfile,
     shouldPersistAttempt,
     saveRankEntry,
-    getRankHistory
+    getRankHistory,
+    getLeaderboard
 };
 })();

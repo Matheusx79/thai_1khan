@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '../js/quiz-ranking.js';
-const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError, buildHistoryEntry, isNewPersonalBest } = globalThis.QuizRanking;
+const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError, buildHistoryEntry, isNewPersonalBest, formatLeaderboardEntry } = globalThis.QuizRanking;
 
 describe('formatModeLabel', () => {
     it('labels th-to-pt mode as Thai to Portuguese', () => {
@@ -114,6 +114,32 @@ describe('buildHistoryEntry', () => {
         const entry = buildHistoryEntry(row, {});
 
         expect(entry).toEqual({
+            score: 4,
+            total: 10,
+            percentage: 40,
+            categoriesLabel: 'Todas',
+            modeLabel: 'Thai ➡️ Português',
+            timestamp: new Date('2024-11-14T12:00:00.000Z').getTime()
+        });
+    });
+});
+
+describe('formatLeaderboardEntry', () => {
+    it('formats a raw get_leaderboard() row into a display entry', () => {
+        const row = {
+            display_name: 'Smoke Test',
+            score: 4,
+            total: 10,
+            percentage: 40,
+            selected_categories: 'all',
+            mode: 'th-to-pt',
+            created_at: '2024-11-14T12:00:00.000Z'
+        };
+
+        const entry = formatLeaderboardEntry(row, {});
+
+        expect(entry).toEqual({
+            displayName: 'Smoke Test',
             score: 4,
             total: 10,
             percentage: 40,
