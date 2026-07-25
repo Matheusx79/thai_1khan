@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '../js/quiz-ranking.js';
-const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError, buildHistoryEntry, isNewPersonalBest, formatLeaderboardEntry } = globalThis.QuizRanking;
+const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError, buildHistoryEntry, isNewPersonalBest, formatLeaderboardEntry, sumHistoryScores } = globalThis.QuizRanking;
 
 describe('formatModeLabel', () => {
     it('labels th-to-pt mode as Thai to Portuguese', () => {
@@ -147,6 +147,26 @@ describe('formatLeaderboardEntry', () => {
             modeLabel: 'Thai ➡️ Português',
             timestamp: new Date('2024-11-14T12:00:00.000Z').getTime()
         });
+    });
+});
+
+describe('sumHistoryScores', () => {
+    it('returns 0 for an empty array', () => {
+        expect(sumHistoryScores([])).toBe(0);
+    });
+
+    it('returns that entry\'s score for a single entry', () => {
+        const entry = { score: 7, total: 10, percentage: 70, categoriesLabel: 'Todas', modeLabel: 'Thai ➡️ Português', timestamp: 1 };
+        expect(sumHistoryScores([entry])).toBe(7);
+    });
+
+    it('returns the total of all scores for multiple entries', () => {
+        const entries = [
+            { score: 4, total: 10, percentage: 40, categoriesLabel: 'Todas', modeLabel: 'Thai ➡️ Português', timestamp: 1 },
+            { score: 2, total: 10, percentage: 20, categoriesLabel: 'Todas', modeLabel: 'Thai ➡️ Português', timestamp: 2 },
+            { score: 9, total: 10, percentage: 90, categoriesLabel: 'Todas', modeLabel: 'Thai ➡️ Português', timestamp: 3 }
+        ];
+        expect(sumHistoryScores(entries)).toBe(15);
     });
 });
 

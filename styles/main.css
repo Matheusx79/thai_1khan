@@ -1020,6 +1020,33 @@ header p {
     text-align: left;
 }
 
+.quiz-history-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.quiz-history-total-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.quiz-history-total-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+}
+
 .quiz-ranking-entry {
     background: var(--bg-tertiary);
     border: 1px solid rgba(237, 230, 211, 0.08);
@@ -1474,6 +1501,18 @@ footer a:hover {
 
     .quiz-ranking-entry {
         padding: 0.85rem 1rem;
+    }
+
+    .quiz-history-total {
+        padding: 0.85rem 1rem;
+    }
+
+    .quiz-history-total-label {
+        font-size: 0.75rem;
+    }
+
+    .quiz-history-total-value {
+        font-size: 1.3rem;
     }
 
     .quiz-ranking-entry-main {

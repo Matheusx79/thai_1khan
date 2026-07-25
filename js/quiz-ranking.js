@@ -72,6 +72,10 @@ function formatLeaderboardEntry(row, categories) {
     };
 }
 
+function sumHistoryScores(entries) {
+    return entries.reduce((sum, entry) => sum + entry.score, 0);
+}
+
 globalThis.QuizRanking = {
     formatModeLabel,
     formatCategoriesLabel,
@@ -80,6 +84,7 @@ globalThis.QuizRanking = {
     mapSaveError,
     buildHistoryEntry,
     isNewPersonalBest,
-    formatLeaderboardEntry
+    formatLeaderboardEntry,
+    sumHistoryScores
 };
 })();
