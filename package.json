@@ -4,8 +4,10 @@
   "description": "Aplicação web interativa para memorização de termos do Muay Thai",
   "main": "index.html",
   "scripts": {
-    "dev": "npx http-server -p 3000 -o"
+    "dev": "npx http-server -p 3000 -o",
+    "test": "vitest run"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "vitest": "^4.1.10"
+  }
 }

@@ -179,6 +179,7 @@
                         </div>
 
                         <button class="start-quiz-btn" id="start-quiz-btn">Iniciar Treino</button>
+                        <button class="quiz-setup-btn quiz-ranking-link-btn" id="quiz-setup-ranking-btn">Ver Ranking</button>
                     </div>
 
                     <!-- Active Quiz Screen -->
@@ -235,7 +236,26 @@
                             <div class="quiz-results-actions">
                                 <button class="start-quiz-btn" id="quiz-retry-btn" style="margin-top: 0;">Refazer Treino</button>
                                 <button class="quiz-setup-btn" id="quiz-finish-btn" style="padding: 1rem 2rem; border-radius: 50px;">Voltar ao Menu</button>
+                                <button class="quiz-setup-btn" id="quiz-results-ranking-btn" style="padding: 1rem 2rem; border-radius: 50px;">Ver Ranking</button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Ranking Screen -->
+                    <div class="quiz-board" id="quiz-ranking-screen" style="display: none;">
+                        <div class="quiz-ranking">
+                            <h2 class="quiz-results-title">Ranking da Sessão</h2>
+                            <p class="quiz-ranking-subtitle">Todos os treinos concluídos nesta sessão, do melhor para o pior. O ranking reseta ao recarregar a página.</p>
+
+                            <ol class="quiz-ranking-list" id="quiz-ranking-list">
+                                <!-- Dynamically populated ranking entries -->
+                            </ol>
+
+                            <div class="quiz-ranking-empty" id="quiz-ranking-empty" style="display: none;">
+                                <p>Você ainda não concluiu nenhum treino nesta sessão. Finalize um treino para ele aparecer aqui!</p>
+                            </div>
+
+                            <button class="quiz-setup-btn" id="quiz-ranking-back-btn" style="padding: 1rem 2rem; border-radius: 50px; margin-top: 1.5rem;">Voltar ao Menu</button>
                         </div>
                     </div>
 
@@ -278,6 +298,7 @@
 
     <!-- Scripts da aplicação -->
     <script src="js/data/techniques.js"></script>
+    <script src="js/quiz-ranking.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

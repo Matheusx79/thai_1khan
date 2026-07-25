@@ -1,0 +1,42 @@
+/**
+ * Pure helpers for the session-based quiz ranking screen.
+ * Follows the same window-global IIFE pattern as js/data/techniques.js.
+ */
+(() => {
+function formatModeLabel(mode) {
+    return mode === 'pt-to-th' ? 'Português ➡️ Thai' : 'Thai ➡️ Português';
+}
+
+function formatCategoriesLabel(selectedCategories, categories) {
+    if (selectedCategories.includes('all')) return 'Todas';
+    return selectedCategories
+        .map(id => categories[id] ? categories[id].title.split(' (')[0] : id)
+        .join(', ');
+}
+
+function buildRankEntry({ score, total, selectedCategories, categories, mode, timestamp }) {
+    return {
+        score,
+        total,
+        percentage: Math.round((score / total) * 100),
+        categoriesLabel: formatCategoriesLabel(selectedCategories, categories),
+        modeLabel: formatModeLabel(mode),
+        timestamp
+    };
+}
+
+function sortRankEntries(entries) {
+    return [...entries].sort((a, b) => {
+        if (b.percentage !== a.percentage) return b.percentage - a.percentage;
+        if (b.score !== a.score) return b.score - a.score;
+        return b.timestamp - a.timestamp;
+    });
+}
+
+globalThis.QuizRanking = {
+    formatModeLabel,
+    formatCategoriesLabel,
+    buildRankEntry,
+    sortRankEntries
+};
+})();

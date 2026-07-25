@@ -32,7 +32,9 @@ const state = {
         limit: 10,
         mode: 'th-to-pt', // 'th-to-pt' or 'pt-to-th'
         hasAnswered: false,
-        correctAnswerIndex: -1
+        correctAnswerIndex: -1,
+        rankEntries: [], // in-memory session ranking, reset on page reload
+        lastRankEntry: null
     }
 };
 
@@ -498,6 +500,9 @@ function initQuiz() {
     const nextBtn = document.getElementById('quiz-next-btn');
     const retryBtn = document.getElementById('quiz-retry-btn');
     const finishBtn = document.getElementById('quiz-finish-btn');
+    const setupRankingBtn = document.getElementById('quiz-setup-ranking-btn');
+    const resultsRankingBtn = document.getElementById('quiz-results-ranking-btn');
+    const rankingBackBtn = document.getElementById('quiz-ranking-back-btn');
 
     // Populate Quiz Setup Category options
     const allOption = document.createElement('button');
@@ -577,12 +582,17 @@ function initQuiz() {
     });
 
     finishBtn.addEventListener('click', resetQuizToSetup);
+
+    setupRankingBtn.addEventListener('click', showRanking);
+    resultsRankingBtn.addEventListener('click', showRanking);
+    rankingBackBtn.addEventListener('click', resetQuizToSetup);
 }
 
 function resetQuizToSetup() {
     state.quiz.active = false;
     document.getElementById('quiz-board').style.display = 'none';
     document.getElementById('quiz-results-screen').style.display = 'none';
+    document.getElementById('quiz-ranking-screen').style.display = 'none';
     document.getElementById('quiz-setup').style.display = 'block';
 }
 
@@ -615,6 +625,7 @@ function startQuiz() {
     // Hide setup screen, show quiz board
     document.getElementById('quiz-setup').style.display = 'none';
     document.getElementById('quiz-results-screen').style.display = 'none';
+    document.getElementById('quiz-ranking-screen').style.display = 'none';
     document.getElementById('quiz-board').style.display = 'block';
 
     displayQuestion();
@@ -768,5 +779,69 @@ function showQuizResults() {
     } else {
         messageEl.textContent = '💪 Não desanime! O Muay Thai exige repetição. Refaça o treino e tente novamente.';
     }
+
+    const entry = window.QuizRanking.buildRankEntry({
+        score,
+        total,
+        selectedCategories: state.quiz.selectedCategories,
+        categories: techniquesData.categories,
+        mode: state.quiz.mode,
+        timestamp: Date.now()
+    });
+    state.quiz.rankEntries.push(entry);
+    state.quiz.lastRankEntry = entry;
+}
+
+/**
+ * Show the session ranking screen, listing every completed quiz run sorted best-to-worst
+ */
+function showRanking() {
+    document.getElementById('quiz-setup').style.display = 'none';
+    document.getElementById('quiz-board').style.display = 'none';
+    document.getElementById('quiz-results-screen').style.display = 'none';
+    document.getElementById('quiz-ranking-screen').style.display = 'block';
+
+    renderRanking();
+}
+
+function renderRanking() {
+    const list = document.getElementById('quiz-ranking-list');
+    const emptyState = document.getElementById('quiz-ranking-empty');
+    list.innerHTML = '';
+
+    if (state.quiz.rankEntries.length === 0) {
+        list.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    list.style.display = 'block';
+    emptyState.style.display = 'none';
+
+    const sortedEntries = window.QuizRanking.sortRankEntries(state.quiz.rankEntries);
+
+    sortedEntries.forEach(entry => {
+        const li = document.createElement('li');
+        li.className = 'quiz-ranking-entry';
+
+        const isNewest = entry === state.quiz.lastRankEntry;
+        const date = new Date(entry.timestamp);
+        const timeLabel = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        li.innerHTML = `
+            <div class="quiz-ranking-entry-main">
+                <span class="quiz-ranking-entry-pct">${entry.percentage}%</span>
+                <span class="quiz-ranking-entry-score">${entry.score}/${entry.total}</span>
+                ${isNewest ? '<span class="quiz-ranking-badge">Novo!</span>' : ''}
+            </div>
+            <div class="quiz-ranking-entry-meta">
+                <span>${entry.categoriesLabel}</span>
+                <span>${entry.modeLabel}</span>
+                <span>${timeLabel}</span>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
 }
 })();
