@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '../js/quiz-ranking.js';
-const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError } = globalThis.QuizRanking;
+const { formatModeLabel, formatCategoriesLabel, buildRankEntry, sortRankEntries, mapSaveError, buildHistoryEntry, isNewPersonalBest } = globalThis.QuizRanking;
 
 describe('formatModeLabel', () => {
     it('labels th-to-pt mode as Thai to Portuguese', () => {
@@ -96,5 +96,56 @@ describe('mapSaveError', () => {
     it('returns a user-facing message when there is an error', () => {
         const error = { message: 'Failed to fetch' };
         expect(mapSaveError(error)).toBe('Não foi possível salvar seu resultado. Verifique sua conexão.');
+    });
+});
+
+describe('buildHistoryEntry', () => {
+    it('formats a raw rank_entries row into a display entry', () => {
+        const row = {
+            id: 'abc-123',
+            score: 4,
+            total: 10,
+            percentage: 40,
+            selected_categories: 'all',
+            mode: 'th-to-pt',
+            created_at: '2024-11-14T12:00:00.000Z'
+        };
+
+        const entry = buildHistoryEntry(row, {});
+
+        expect(entry).toEqual({
+            score: 4,
+            total: 10,
+            percentage: 40,
+            categoriesLabel: 'Todas',
+            modeLabel: 'Thai ➡️ Português',
+            timestamp: new Date('2024-11-14T12:00:00.000Z').getTime()
+        });
+    });
+});
+
+describe('isNewPersonalBest', () => {
+    it('returns true when the entry is the top-ranked entry among all entries', () => {
+        const best = { percentage: 90, score: 9, timestamp: 100 };
+        const worse = { percentage: 50, score: 5, timestamp: 100 };
+
+        expect(isNewPersonalBest(best, [best, worse])).toBe(true);
+    });
+
+    it('returns false when another entry outranks it', () => {
+        const best = { percentage: 90, score: 9, timestamp: 100 };
+        const worse = { percentage: 50, score: 5, timestamp: 100 };
+
+        expect(isNewPersonalBest(worse, [best, worse])).toBe(false);
+    });
+
+    it('does not throw when two entries tie for best and treats one of them as the best', () => {
+        const tiedA = { percentage: 80, score: 8, timestamp: 100 };
+        const tiedB = { percentage: 80, score: 8, timestamp: 100 };
+
+        expect(() => isNewPersonalBest(tiedA, [tiedA, tiedB])).not.toThrow();
+        expect(
+            isNewPersonalBest(tiedA, [tiedA, tiedB]) || isNewPersonalBest(tiedB, [tiedA, tiedB])
+        ).toBe(true);
     });
 });

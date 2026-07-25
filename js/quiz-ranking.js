@@ -38,11 +38,29 @@ function mapSaveError(error) {
     return 'Não foi possível salvar seu resultado. Verifique sua conexão.';
 }
 
+function buildHistoryEntry(row, categories) {
+    const selectedCategories = row.selected_categories.split(',');
+    return {
+        score: row.score,
+        total: row.total,
+        percentage: row.percentage,
+        categoriesLabel: formatCategoriesLabel(selectedCategories, categories),
+        modeLabel: formatModeLabel(row.mode),
+        timestamp: new Date(row.created_at).getTime()
+    };
+}
+
+function isNewPersonalBest(entry, allEntries) {
+    return sortRankEntries(allEntries)[0] === entry;
+}
+
 globalThis.QuizRanking = {
     formatModeLabel,
     formatCategoriesLabel,
     buildRankEntry,
     sortRankEntries,
-    mapSaveError
+    mapSaveError,
+    buildHistoryEntry,
+    isNewPersonalBest
 };
 })();

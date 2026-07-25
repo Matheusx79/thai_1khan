@@ -34,7 +34,8 @@ const state = {
         hasAnswered: false,
         correctAnswerIndex: -1,
         rankEntries: [], // in-memory session ranking, reset on page reload
-        lastRankEntry: null
+        lastRankEntry: null,
+        historyEntries: [] // logged-in user's persisted rank_entries rows, refreshed on each ranking screen visit
     }
 };
 
@@ -505,6 +506,8 @@ function initQuiz() {
     const rankingBackBtn = document.getElementById('quiz-ranking-back-btn');
     const loginForm = document.getElementById('quiz-login-form');
     const logoutBtn = document.getElementById('quiz-logout-btn');
+    const historyTabBtn = document.getElementById('quiz-history-tab-btn');
+    const leaderboardTabBtn = document.getElementById('quiz-leaderboard-tab-btn');
 
     // Populate Quiz Setup Category options
     const allOption = document.createElement('button');
@@ -591,6 +594,9 @@ function initQuiz() {
 
     loginForm.addEventListener('submit', handleLoginSubmit);
     logoutBtn.addEventListener('click', handleLogoutClick);
+
+    historyTabBtn.addEventListener('click', () => showRankingTab('history'));
+    leaderboardTabBtn.addEventListener('click', () => showRankingTab('leaderboard'));
 }
 
 async function handleLoginSubmit(e) {
@@ -635,25 +641,103 @@ async function handleLogoutClick() {
 }
 
 /**
- * Toggle the ranking screen between the guest login prompt and the
- * logged-in account view, based on the current Supabase session.
+ * Toggle the ranking screen between the guest login prompt (with the
+ * session-only ranking list) and the logged-in account view (with the
+ * My History / Ranking Geral tabs), based on the current Supabase session.
  */
 async function updateRankingAuthUI() {
     const guestCta = document.getElementById('quiz-ranking-guest-cta');
     const accountBox = document.getElementById('quiz-ranking-account');
     const accountName = document.getElementById('quiz-account-name');
+    const sessionRanking = document.getElementById('quiz-session-ranking');
+    const rankingTabs = document.getElementById('quiz-ranking-tabs');
 
     const session = await window.Auth.getSession();
 
     if (session) {
         guestCta.style.display = 'none';
         accountBox.style.display = 'block';
+        sessionRanking.style.display = 'none';
+        rankingTabs.style.display = 'block';
         const profile = await window.Auth.getCurrentProfile();
         accountName.textContent = profile ? profile.display_name : session.user.email;
+        await loadHistory(session.user.id);
     } else {
         guestCta.style.display = 'block';
         accountBox.style.display = 'none';
+        sessionRanking.style.display = 'block';
+        rankingTabs.style.display = 'none';
     }
+}
+
+/**
+ * Switch the logged-in ranking screen between the "Meu Histórico" (ticket #6)
+ * and "Ranking Geral" (ticket #7) sub-views.
+ */
+function showRankingTab(tab) {
+    const historyTabBtn = document.getElementById('quiz-history-tab-btn');
+    const leaderboardTabBtn = document.getElementById('quiz-leaderboard-tab-btn');
+    const historyContent = document.getElementById('quiz-history-content');
+    const leaderboardContent = document.getElementById('quiz-leaderboard-content');
+
+    const showHistory = tab === 'history';
+    historyTabBtn.classList.toggle('active', showHistory);
+    leaderboardTabBtn.classList.toggle('active', !showHistory);
+    historyContent.style.display = showHistory ? 'block' : 'none';
+    leaderboardContent.style.display = showHistory ? 'none' : 'block';
+}
+
+/**
+ * Fetch the logged-in user's own persisted quiz attempts and render them.
+ */
+async function loadHistory(userId) {
+    const rows = await window.Auth.getRankHistory(userId);
+    state.quiz.historyEntries = rows.map(row =>
+        window.QuizRanking.buildHistoryEntry(row, techniquesData.categories)
+    );
+    renderHistory();
+}
+
+function renderHistory() {
+    const list = document.getElementById('quiz-history-list');
+    const emptyState = document.getElementById('quiz-history-empty');
+    list.innerHTML = '';
+
+    if (state.quiz.historyEntries.length === 0) {
+        list.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    list.style.display = 'block';
+    emptyState.style.display = 'none';
+
+    const sortedEntries = window.QuizRanking.sortRankEntries(state.quiz.historyEntries);
+
+    sortedEntries.forEach(entry => {
+        const li = document.createElement('li');
+        li.className = 'quiz-ranking-entry';
+
+        const isBest = window.QuizRanking.isNewPersonalBest(entry, state.quiz.historyEntries);
+        const date = new Date(entry.timestamp);
+        const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const timeLabel = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        li.innerHTML = `
+            <div class="quiz-ranking-entry-main">
+                <span class="quiz-ranking-entry-pct">${entry.percentage}%</span>
+                <span class="quiz-ranking-entry-score">${entry.score}/${entry.total}</span>
+                ${isBest ? '<span class="quiz-ranking-badge">Recorde!</span>' : ''}
+            </div>
+            <div class="quiz-ranking-entry-meta">
+                <span>${entry.categoriesLabel}</span>
+                <span>${entry.modeLabel}</span>
+                <span>${dateLabel} ${timeLabel}</span>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
 }
 
 function resetQuizToSetup() {

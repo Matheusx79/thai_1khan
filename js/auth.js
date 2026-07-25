@@ -75,6 +75,22 @@ async function saveRankEntry({ userId, score, total, percentage, selectedCategor
     return { error };
 }
 
+/**
+ * Fetch every rank_entries row belonging to the given user, newest first.
+ * RLS already restricts this to the caller's own rows; returns [] on error
+ * so the "My History" view can render an empty state rather than throw.
+ */
+async function getRankHistory(userId) {
+    const { data, error } = await client
+        .from('rank_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) return [];
+    return data;
+}
+
 globalThis.Auth = {
     validateLoginInput,
     signIn,
@@ -82,6 +98,7 @@ globalThis.Auth = {
     getSession,
     getCurrentProfile,
     shouldPersistAttempt,
-    saveRankEntry
+    saveRankEntry,
+    getRankHistory
 };
 })();

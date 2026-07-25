@@ -268,12 +268,36 @@
                                 </div>
                             </div>
 
-                            <ol class="quiz-ranking-list" id="quiz-ranking-list">
-                                <!-- Dynamically populated ranking entries -->
-                            </ol>
+                            <!-- Guest experience: session-only ranking (untouched by ticket #6, hidden once logged in) -->
+                            <div id="quiz-session-ranking">
+                                <ol class="quiz-ranking-list" id="quiz-ranking-list">
+                                    <!-- Dynamically populated ranking entries -->
+                                </ol>
 
-                            <div class="quiz-ranking-empty" id="quiz-ranking-empty" style="display: none;">
-                                <p>Você ainda não concluiu nenhum treino nesta sessão. Finalize um treino para ele aparecer aqui!</p>
+                                <div class="quiz-ranking-empty" id="quiz-ranking-empty" style="display: none;">
+                                    <p>Você ainda não concluiu nenhum treino nesta sessão. Finalize um treino para ele aparecer aqui!</p>
+                                </div>
+                            </div>
+
+                            <!-- Logged-in experience: My History (ticket #6) / Leaderboard (ticket #7) toggle -->
+                            <div class="quiz-ranking-tabs" id="quiz-ranking-tabs" style="display: none;">
+                                <div class="quiz-ranking-tab-buttons">
+                                    <button type="button" class="quiz-ranking-tab-btn active" id="quiz-history-tab-btn">Meu Histórico</button>
+                                    <button type="button" class="quiz-ranking-tab-btn" id="quiz-leaderboard-tab-btn">Ranking Geral</button>
+                                </div>
+
+                                <div id="quiz-history-content">
+                                    <ol class="quiz-ranking-list" id="quiz-history-list">
+                                        <!-- Dynamically populated with the logged-in user's own rank_entries rows -->
+                                    </ol>
+
+                                    <div class="quiz-ranking-empty" id="quiz-history-empty" style="display: none;">
+                                        <p>Você ainda não tem treinos salvos. Finalize um treino logado para começar seu histórico!</p>
+                                    </div>
+                                </div>
+
+                                <!-- Ticket #7 (Leaderboard view) fills this in independently -->
+                                <div id="quiz-leaderboard-content" style="display: none;"></div>
                             </div>
 
                             <button class="quiz-setup-btn" id="quiz-ranking-back-btn" style="padding: 1rem 2rem; border-radius: 50px; margin-top: 1.5rem;">Voltar ao Menu</button>
