@@ -703,16 +703,21 @@ async function loadHistory(userId) {
 function renderHistory() {
     const list = document.getElementById('quiz-history-list');
     const emptyState = document.getElementById('quiz-history-empty');
+    const totalBox = document.getElementById('quiz-history-total');
+    const totalValue = document.getElementById('quiz-history-total-value');
     list.innerHTML = '';
 
     if (state.quiz.historyEntries.length === 0) {
         list.style.display = 'none';
         emptyState.style.display = 'block';
+        totalBox.style.display = 'none';
         return;
     }
 
     list.style.display = 'block';
     emptyState.style.display = 'none';
+    totalBox.style.display = 'block';
+    totalValue.textContent = window.QuizRanking.sumHistoryScores(state.quiz.historyEntries);
 
     const sortedEntries = window.QuizRanking.sortRankEntries(state.quiz.historyEntries);
 
